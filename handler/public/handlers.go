@@ -1,7 +1,7 @@
 package public
 
 import (
-	"final/structs"
+	"final/db"
 	"fmt"
 	"net/http"
 
@@ -10,7 +10,7 @@ import (
 
 func Hello(ctx *gin.Context) {
 	fmt.Println(ctx.Value("user_info"))
-	val, ok := ctx.Value("user_info").(structs.UserRet)
+	val, ok := ctx.Value("user_info").(db.UserRet)
 	if !ok {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "Hello, Bad Unauthorized User!",
