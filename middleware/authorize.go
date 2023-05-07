@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthoriseHeader() gin.HandlerFunc {
+const anyRole db.UserRole = "any"
+
+func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		username := ctx.GetHeader("username")
 		password := ctx.GetHeader("password")
@@ -28,7 +30,30 @@ func AuthoriseHeader() gin.HandlerFunc {
 					"error": "Internal error: " + err.Error(),
 				})
 			}
+			return
+		}
+		if role != anyRole && role != user_info.Role {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "User must have role: " + role,
+			})
+			return
 		}
 		ctx.Set("user_info", *user_info)
 	}
+}
+
+func Authorise() gin.HandlerFunc {
+	return authorizeWithRole(anyRole)
+}
+
+func AuthoriseAdmin() gin.HandlerFunc {
+	return authorizeWithRole(db.ADMIN)
+}
+
+func AuthoriseSeller() gin.HandlerFunc {
+	return authorizeWithRole(db.SELLER)
+}
+
+func AuthoriseBuyer() gin.HandlerFunc {
+	return authorizeWithRole(db.BUYER)
 }

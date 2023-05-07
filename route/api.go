@@ -7,14 +7,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupAPI() error {
+func SetupAPI(address string) error {
 	r := gin.Default()
 	r.GET("/", public.Hello)
 
-	apiRoutes := r.Group("/api")
+	publicRoutes := r.Group("/public")
+	{
+		publicRoutes.GET("/hello", public.Hello)
+	}
 
-	authorized_routes := apiRoutes.Group("/public", middleware.AuthoriseHeader())
-	authorized_routes.GET("/", public.Hello)
+	authRoutes := r.Group("/auth")
+	{
+		authRoutes.GET("/login", middleware.Authorise(), public.Hello)
+	}
 
-	return r.Run()
+	buyerRoutes := r.Group("/buyer", middleware.AuthoriseBuyer())
+	{
+		buyerRoutes.GET("/hello", public.Hello)
+	}
+
+	sellerRoutes := r.Group("/seller", middleware.AuthoriseSeller())
+	{
+		sellerRoutes.GET("/hello", public.Hello)
+	}
+
+	adminRoutes := r.Group("/admin", middleware.AuthoriseAdmin())
+	{
+		adminRoutes.GET("/hello", public.Hello)
+	}
+
+	return r.Run(address)
 }

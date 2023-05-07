@@ -9,7 +9,6 @@ import (
 )
 
 func Hello(ctx *gin.Context) {
-	fmt.Println(ctx.Value("user_info"))
 	val, ok := ctx.Value("user_info").(db.UserRet)
 	if !ok {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -17,7 +16,7 @@ func Hello(ctx *gin.Context) {
 		})
 	} else {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Hello, %s!", val.Name),
+			"message": fmt.Sprintf("Hello, %s %s!", val.Role, val.Name),
 		})
 	}
 }
