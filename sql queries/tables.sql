@@ -1,7 +1,6 @@
 -- create database go_final;
 -- create extension pgcrypto;
 
-
 -- drop type if exists user_role;
 create type user_role as Enum (
     'admin',
@@ -55,7 +54,7 @@ create table product_seller
 create or replace function user_is_seller() returns trigger as
 $$
 begin
-    if (select count(*) from users where id == new.seller_id and role == 'seller') != 1 then
+    if (select count(*) from users where id = new.seller_id and role = 'seller') != 1 then
         raise exception 'there is no seller with this id';
     end if;
     return new;
@@ -92,3 +91,4 @@ create table scores
     rating      numeric(3, 2) check ( rating >= 0 and rating <= 5 ),
     comment     text
 );
+
