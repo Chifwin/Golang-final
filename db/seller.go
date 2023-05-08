@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 type Sellers struct {
@@ -13,6 +14,13 @@ type Scores struct {
 	ProductId int
 	Rating    float64
 	Comment   string
+	Date      time.Time
+}
+
+type Products struct {
+	ProductId int     `json:"productId"`
+	Quantity  uint64  `json:"quantity"`
+	Cost      float64 `json:"cost"`
 }
 
 func ListSellers() ([]Sellers, error) {
@@ -36,15 +44,34 @@ func ListSellers() ([]Sellers, error) {
 	return sellers, nil
 }
 
-func FindSellerById(id int) (*Sellers, error) {
+func SellerProducts(id int) ([]Products, error) {
 	db := getConn()
-	var seller Sellers
-	err := db.QueryRow(context.Background(), "select id, name from users where role = $1 and id = $2", SELLER, id).Scan(&seller.ID, &seller.Name)
+
+	rows, err := db.Query(context.Background(), `
+        SELECT ps.product_id, ps.quantity, ps.const
+        FROM product_seller ps
+        JOIN users u ON ps.seller_id = u.id
+        WHERE u.id = $1`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sellerProducts []Products
+	for rows.Next() {
+		var sellerProduct Products
+		err = rows.Scan(&sellerProduct.ProductId, &sellerProduct.Quantity, &sellerProduct.Cost)
+		if err != nil {
+			return nil, err
+		}
+		sellerProducts = append(sellerProducts, sellerProduct)
+	}
+	err = rows.Err()
 	if err != nil {
 		return nil, err
 	}
 
-	return &seller, nil
+	return sellerProducts, nil
 
 }
 
@@ -52,7 +79,7 @@ func SellerScores(id int) ([]Scores, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), `
-		SELECT p.id, s.rating, s.comment
+		SELECT p.id, s.rating, s.comment , p.date
 		FROM scores s
 		JOIN purchases p ON s.purchase_id = p.id
 		WHERE p.seller_id = $1`, id)
@@ -64,7 +91,7 @@ func SellerScores(id int) ([]Scores, error) {
 	var scores []Scores
 	for rows.Next() {
 		var score Scores
-		err = rows.Scan(&score.ProductId, &score.Rating, &score.Comment)
+		err = rows.Scan(&score.ProductId, &score.Rating, &score.Comment, &score.Date)
 		if err != nil {
 			return nil, err
 		}

@@ -15,7 +15,7 @@ func SetupAPI(address string) error {
 	{
 		publicRoutes.GET("/hello", public.Hello)
 		publicRoutes.GET("/sellers", public.ListOfAllSellers)
-		publicRoutes.GET("/sellers/:id", public.SellerInfo)
+		publicRoutes.GET("/sellers/:id/products", public.SellerProducts)
 		publicRoutes.GET("/sellers/:id/scores", public.SellersScores)
 	}
 

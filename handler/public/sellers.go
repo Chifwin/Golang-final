@@ -23,24 +23,26 @@ func ListOfAllSellers(ctx *gin.Context) {
 	})
 }
 
-func SellerInfo(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+func SellerProducts(ctx *gin.Context) {
+	sellerID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid seller ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid seller ID"})
 		return
 	}
 
-	seller, err := db.FindSellerById(id)
+	products, err := db.SellerProducts(sellerID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Seller not found"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller products not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get seller"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get seller products"})
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, seller)
+	ctx.JSON(http.StatusOK, gin.H{
+		"products": products,
+	})
 }
 
 func SellersScores(ctx *gin.Context) {
