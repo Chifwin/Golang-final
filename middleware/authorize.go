@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"database/sql"
 	"final/db"
 	"net/http"
 
@@ -21,7 +22,7 @@ func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 		}
 		user_info, err := db.AuthoriseUser(username, password)
 		if err != nil || user_info == nil {
-			if err == db.ErrNotFound {
+			if err == sql.ErrNoRows {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"error": "No user with this credintails",
 				})

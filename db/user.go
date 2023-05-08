@@ -2,14 +2,7 @@ package db
 
 import (
 	"context"
-	"errors"
 	"fmt"
-
-	"github.com/jackc/pgx/v5"
-)
-
-var (
-	ErrNotFound = errors.New("not found")
 )
 
 type UserRole string
@@ -45,12 +38,8 @@ func AuthoriseUser(username, password string) (*UserRet, error) {
 	db := getConn()
 	fmt.Printf("Login with username: %s and password %s\n", username, password)
 	err := db.QueryRow(context.Background(), "select * from authorise_user($1, $2)", username, password).Scan(&res.ID, &res.Username, &res.Name, &res.Role)
-	switch err {
-	case nil:
-		return &res, nil
-	case pgx.ErrNoRows:
-		return nil, ErrNotFound
-	default:
+	if err != nil {
 		return nil, err
 	}
+	return &res, nil
 }

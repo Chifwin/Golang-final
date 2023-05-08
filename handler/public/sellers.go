@@ -3,9 +3,10 @@ package public
 import (
 	"database/sql"
 	"final/db"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ListOfAllSellers(ctx *gin.Context) {
