@@ -1,14 +1,15 @@
 -- create database go_final;
--- create extension pgcrypto;
 
--- drop type if exists user_role;
+create extension pgcrypto;
+
+drop type if exists user_role cascade;
 create type user_role as Enum (
     'admin',
     'seller',
     'buyer'
     );
 
--- drop table if exists users;
+drop table if exists users cascade;
 create table users
 (
     id       serial primary key,
@@ -20,7 +21,7 @@ create table users
 create or replace function restrict_user_role_change() returns trigger as
 $$
 begin
-    if (new.role != old.role) != 1 then
+    if (new.role != old.role) then
         raise exception 'users can not change roles';
     end if;
     return new;
@@ -33,7 +34,7 @@ create or replace trigger restrict_user_role_change_tg
     for each row
 execute function restrict_user_role_change();
 
--- drop table if exists products;
+drop table if exists products cascade;
 create table products
 (
     id          serial primary key,
@@ -41,13 +42,13 @@ create table products
     description text
 );
 
--- drop table if exists product_seller;
+drop table if exists product_seller cascade;
 create table product_seller
 (
     product_id int references products (id) on update cascade on delete restrict,
     seller_id  int     references users (id) on update cascade on delete set null,
     quantity   int check ( quantity >= 0 ),
-    const      numeric(10, 2) check ( quantity > 0 ),
+    cost      numeric(10, 2) check ( quantity > 0 ),
     published  boolean not null,
     primary key (product_id, seller_id)
 );
@@ -67,7 +68,7 @@ create or replace trigger product_seller_tg
     for each row
 execute function user_is_seller();
 
--- drop table if exists purchases;
+drop table if exists purchases cascade;
 create table purchases
 (
     id         serial primary key,
@@ -83,7 +84,7 @@ create or replace trigger product_seller_tg
     for each row
 execute function user_is_seller();
 
--- drop table if exists scores;
+drop table if exists scores cascade;
 create table scores
 (
     id          serial primary key,

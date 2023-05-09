@@ -1,6 +1,7 @@
 package route
 
 import (
+	"final/handler/buyer"
 	"final/handler/public"
 	"final/middleware"
 
@@ -15,7 +16,7 @@ func SetupAPI(address string) error {
 	{
 		publicRoutes.GET("/hello", public.Hello)
 		publicRoutes.GET("/sellers", public.ListOfAllSellers)
-		publicRoutes.GET("/sellers/:id", public.SellerInfo)
+		publicRoutes.GET("/sellers/:id/products", public.SellerProducts)
 		publicRoutes.GET("/sellers/:id/scores", public.SellersScores)
 	}
 
@@ -27,6 +28,12 @@ func SetupAPI(address string) error {
 	buyerRoutes := r.Group("/buyer", middleware.AuthoriseBuyer())
 	{
 		buyerRoutes.GET("/hello", public.Hello)
+		buyerRoutes.GET("/purchases", buyer.ListOfAllPurchases)
+		buyerRoutes.POST("/purchases/", buyer.AddPurchases)
+		buyerRoutes.GET("/rate", buyer.GetComment)
+		buyerRoutes.POST("/rate/", buyer.CreateComment)
+		buyerRoutes.PUT("/rate/:id", buyer.UpdateComment)
+		buyerRoutes.DELETE("/rate/:id", buyer.DeleteComment)
 	}
 
 	sellerRoutes := r.Group("/seller", middleware.AuthoriseSeller())

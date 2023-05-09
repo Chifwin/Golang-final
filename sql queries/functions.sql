@@ -4,10 +4,10 @@ create
     or replace function authorise_user(in in_username varchar, in in_password text)
     returns table
             (
-                _id  integer,
+                _id       integer,
                 _username varchar,
-                _name varchar,
-                _role user_role
+                _name     varchar,
+                _role     user_role
             )
     language plpgsql
 as
@@ -30,5 +30,34 @@ $$
 begin
     insert into users(username, password, name, role)
     values (_username, crypt(_password, gen_salt('bf')), _name, role);
+end;
+$$;
+
+-- Buyer function
+create or replace function buy(_buyer_id integer, _seller_id integer, _product_id integer, _quantity integer)
+    returns table
+            (
+                like purchases
+            )
+    language plpgsql
+as
+$$
+begin
+    if ((select count(*)
+         from product_seller
+         where product_id = _product_id
+           and seller_id = _seller_id
+           and published = true) != 1) then
+        raise 'seller do not have such product or it is not published';
+    end if;
+
+    update product_seller
+    set quantity = quantity - _quantity
+    where product_id = _product_id
+      and seller_id = _seller_id
+      and published = true;
+
+    return query insert into purchases (buyer_id, product_id, seller_id, quantity)
+        values (_buyer_id, _product_id, _seller_id, _quantity) returning *;
 end;
 $$;
