@@ -17,7 +17,7 @@ func scanComment(rows pgx.Row) (Scores, error) {
 func GetBuyerComments(buyer_id int) ([]Scores, error) {
 	db := getConn()
 
-	rows, err := db.Query(context.Background(), "SELECT * FROM scores WHERE purchase_id=$1", buyer_id)
+	rows, err := db.Query(context.Background(), "SELECT * FROM scores WHERE purchase_id in (SELECT id FROM purchase where buyer_id=$1)", buyer_id)
 	scores := make([]Scores, 0)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -40,7 +40,7 @@ func GetBuyerComments(buyer_id int) ([]Scores, error) {
 func CreateComment(score Scores) (Scores, error) {
 	db := getConn()
 	fmt.Println(score)
-	row := db.QueryRow(context.Background(), "select * from score($1, $2, $3)",
+	row := db.QueryRow(context.Background(), "insert into score (purchase_id, rating, comment) value($1, $2, $3)",
 		score.ProductId, score.Rating, score.Comment)
 	score, err := scanComment(row)
 	return score, err
@@ -49,35 +49,16 @@ func CreateComment(score Scores) (Scores, error) {
 func UpdateCommentDB(id int, scores Scores) (Scores, error) {
 	db := getConn()
 	var score Scores
-	_, err := db.Exec(context.Background(), "UPDATE scores SET purchase_id=$1, rating=$2, comment=$3 WHERE product_id=$4",
-		score.ProductId, score.Rating, score.Comment, id, BUYER)
-	if err != nil {
-		return score, err
-	}
+	row := db.QueryRow(context.Background(), "UPDATE scores SET rating=$2, comment=$3 WHERE purchase_id=$1 and purchase_id in (select id from purchase where buyer_id = $4) returning *",
+		score.ProductId, score.Rating, score.Comment, id)
+	score, err := scanComment(row)
 
-	return score, nil
+	return score, err
 }
-
-
-// func CreateCommentDB() (Scores, error) {
-// 	db := getConn()
-// 	var score Scores
-// 	_, err := db.Exec(context.Background(), "INSERT INTO scores (purchase_id, rating, comment) VALUES ($1, $2, $3)",
-// 		score.ProductId, score.Rating, score.Comment, BUYER)
-// 	if err != nil {
-// 		return score, err
-// 	}
-
-// 	return score, nil
-// }
 
 func DeleteCommentDB(id int) (Scores, error) {
 	db := getConn()
-	var score Scores
-	_, err := db.Exec(context.Background(), "DELETE FROM scores WHERE purchase_id=$1", id, BUYER)
-	if err != nil {
-		return score, err
-	}
-
-	return score, nil
+	row := db.QueryRow(context.Background(), "DELETE FROM scores WHERE purchase_id in (select id from purchase where buyer_id = $1)", id)
+	score, err := scanComment(row)
+	return score, err
 }
