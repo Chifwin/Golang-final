@@ -2,7 +2,7 @@ package buyer
 
 import (
 	"database/sql"
-	"final/db"
+	"golang-final/db"
 	"net/http"
 	"strconv"
 
@@ -48,8 +48,12 @@ func AddPurchases(ctx *gin.Context) {
 	})
 }
 
+
+// Score
 func GetComment(ctx *gin.Context) {
-	scores, err := db.GetCommentDB()
+	val := ctx.Value("user_info").(db.UserRet)
+	scores, err := db.GetBuyerComments(val.ID)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get scores",
@@ -59,44 +63,66 @@ func GetComment(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"scores": scores,
+	})
+}
+
+func AddComment(ctx *gin.Context) {
+	val := ctx.Value("user_info").(db.UserRet)
+	var score db.Scores
+	if err := ctx.ShouldBindJSON(&score); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "No data provided",
+		})
+		return
+	}
+	score.ProductId = val.ID
+	res_score, err := db.CreateComment(score)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get scores with error: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"score": res_score,
 	})
 }
 
 func UpdateComment(ctx *gin.Context) {
+	val := ctx.Value("user_info").(db.UserRet)
+	var score db.Scores
+	if err := ctx.ShouldBindJSON(&score); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "No data provided",
+		})
+		return
+	}
+	score.ProductId = val.ID
+
+	// Get the ID of the comment to update from the URL parameter
 	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid scores ID"})
-		return
-	}
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error": "Invalid comment ID",
+        })
+        return
+    }
 
-	scores, err := db.UpdateCommentDB(id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller scores not found"})
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get scores scores"})
-		}
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"scores": scores,
-	})
-}
-
-func CreateComment(ctx *gin.Context) {
-	scores, err := db.CreateCommentDB()
+	res_score, err := db.UpdateCommentDB(id, score)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get scores",
+			"error": "Failed to update comment with error: " + err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"scores": scores,
+		"score": res_score,
 	})
 }
+
+
 
 func DeleteComment(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))

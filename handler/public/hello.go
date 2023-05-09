@@ -1,7 +1,7 @@
 package public
 
 import (
-	"final/db"
+	"golang-final/db"
 	"fmt"
 	"net/http"
 

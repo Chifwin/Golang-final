@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"database/sql"
-	"final/db"
+	"golang-final/db"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

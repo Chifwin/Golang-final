@@ -2,7 +2,7 @@ package public
 
 import (
 	"database/sql"
-	"final/db"
+	"golang-final/db"
 	"net/http"
 	"strconv"
 

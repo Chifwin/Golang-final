@@ -1,9 +1,9 @@
 package route
 
 import (
-	"final/handler/buyer"
-	"final/handler/public"
-	"final/middleware"
+	"golang-final/handler/buyer"
+	"golang-final/handler/public"
+	"golang-final/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +31,7 @@ func SetupAPI(address string) error {
 		buyerRoutes.GET("/purchases", buyer.ListOfAllPurchases)
 		buyerRoutes.POST("/purchases/", buyer.AddPurchases)
 		buyerRoutes.GET("/rate", buyer.GetComment)
-		buyerRoutes.POST("/rate/", buyer.CreateComment)
+		buyerRoutes.POST("/rate/", buyer.AddComment)
 		buyerRoutes.PUT("/rate/:id", buyer.UpdateComment)
 		buyerRoutes.DELETE("/rate/:id", buyer.DeleteComment)
 	}

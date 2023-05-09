@@ -11,10 +11,10 @@ type Sellers struct {
 }
 
 type Scores struct {
-	ProductId int
-	Rating    float64
-	Comment   string
-	Date      time.Time
+	ProductId int          `json:"purchase_id" binding:"required"`
+	Rating    float64      `json:"rating"`
+	Comment   string       `json:"comment"`
+	Date      time.Time    `json:"date"`
 }
 
 type Products struct {

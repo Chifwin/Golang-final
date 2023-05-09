@@ -1,7 +1,7 @@
 package main
 
 import (
-	"final/route"
+	"golang-final/route"
 	"log"
 
 	"github.com/joho/godotenv"
