@@ -10,7 +10,4 @@ values ((select id from products limit 1),
         (select id from users where role = 'seller' limit 1),
         500, 10, true);
 
-select *
-from buy((select id from users where role = 'buyer' limit 1),
-         (select id from users where role = 'seller' limit 1),
-         (select id from products limit 1), 10)
+insert into scores values ((select id from purchases limit 1), 5, '');

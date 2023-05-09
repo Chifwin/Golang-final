@@ -11,7 +11,7 @@ import (
 
 func ListOfAllPurchases(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
-	purchases, err := db.GetPurchases(val.ID)
+	purchases, err := db.GetBuyerPurchases(val.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{

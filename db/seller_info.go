@@ -48,7 +48,7 @@ func SellerProducts(id int) ([]Products, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), `
-        SELECT ps.product_id, ps.quantity, ps.const
+        SELECT ps.product_id, ps.quantity, ps.cost
         FROM product_seller ps
         JOIN users u ON ps.seller_id = u.id
         WHERE u.id = $1`, id)
