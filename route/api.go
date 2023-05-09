@@ -18,6 +18,10 @@ func SetupAPI(address string) error {
 		publicRoutes.GET("/sellers", public.ListOfAllSellers)
 		publicRoutes.GET("/sellers/:id/products", public.SellerProducts)
 		publicRoutes.GET("/sellers/:id/scores", public.SellersScores)
+		publicRoutes.GET("/products", public.ListOfAllProducts)
+		publicRoutes.GET("/products/:id/sellers", public.SellerProducts)
+		publicRoutes.GET("/products/:id/scores", public.SellersScores)
+		// publicRoutes.GET("/products", public.ProductSearch)
 	}
 
 	authRoutes := r.Group("/auth")
