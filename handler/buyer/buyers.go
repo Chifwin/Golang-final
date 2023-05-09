@@ -1,7 +1,7 @@
 package buyer
 
 import (
-	"database/sql"
+	// "database/sql"
 	"golang-final/db"
 	"net/http"
 	"strconv"
@@ -48,8 +48,7 @@ func AddPurchases(ctx *gin.Context) {
 	})
 }
 
-
-// Score
+// Comment
 func GetComment(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
 	scores, err := db.GetBuyerComments(val.ID)
@@ -102,12 +101,12 @@ func UpdateComment(ctx *gin.Context) {
 
 	// Get the ID of the comment to update from the URL parameter
 	id, err := strconv.Atoi(ctx.Param("id"))
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{
-            "error": "Invalid comment ID",
-        })
-        return
-    }
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid comment ID",
+		})
+		return
+	}
 
 	res_score, err := db.UpdateCommentDB(id, score)
 	if err != nil {
@@ -122,8 +121,6 @@ func UpdateComment(ctx *gin.Context) {
 	})
 }
 
-
-
 func DeleteComment(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -133,11 +130,7 @@ func DeleteComment(ctx *gin.Context) {
 
 	scores, err := db.DeleteCommentDB(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller scores not found"})
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get scores scores"})
-		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get scores"})
 		return
 	}
 
