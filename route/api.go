@@ -3,6 +3,7 @@ package route
 import (
 	"golang-final/handler/buyer"
 	"golang-final/handler/public"
+	"golang-final/handler/seller"
 	"golang-final/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,10 @@ func SetupAPI(address string) error {
 	sellerRoutes := r.Group("/seller", middleware.AuthoriseSeller())
 	{
 		sellerRoutes.GET("/hello", public.Hello)
+		sellerRoutes.GET("/products", seller.SellerProducts)
+		sellerRoutes.PUT("/products/:id", seller.UpdateSellerProduct)
+		sellerRoutes.DELETE("/products/:id", seller.DeleteSellerProduct)
+		sellerRoutes.GET("/purchases", seller.PurchasesSeller)
 	}
 
 	adminRoutes := r.Group("/admin", middleware.AuthoriseAdmin())

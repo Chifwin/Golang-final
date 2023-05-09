@@ -10,4 +10,6 @@ values ((select id from products limit 1),
         (select id from users where role = 'seller' limit 1),
         500, 10, true);
 
+call buy((select id from users where role = 'buyer' limit 1), (select id from users where role = 'seller' limit 1), (select id from products limit 1), 500)
+
 insert into scores values ((select id from purchases limit 1), 5, '');
