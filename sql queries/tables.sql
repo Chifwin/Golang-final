@@ -48,7 +48,7 @@ create table product_seller
     product_id int references products (id) on update cascade on delete restrict,
     seller_id  int     references users (id) on update cascade on delete set null,
     quantity   int check ( quantity >= 0 ),
-    cost      numeric(10, 2) check ( quantity > 0 ),
+    cost       numeric(10, 2) check ( quantity > 0 ),
     published  boolean not null,
     primary key (product_id, seller_id)
 );
@@ -87,8 +87,7 @@ execute function user_is_seller();
 drop table if exists scores cascade;
 create table scores
 (
-    id          serial primary key,
-    purchase_id int references purchases (id) on delete cascade,
+    purchase_id int primary key references purchases (id) on delete cascade,
     rating      numeric(3, 2) check ( rating >= 0 and rating <= 5 ),
     comment     text
 );
