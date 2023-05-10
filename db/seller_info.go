@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 type Sellers struct {
@@ -11,10 +10,9 @@ type Sellers struct {
 }
 
 type Scores struct {
-	ProductId int          `json:"purchase_id" binding:"required"`
-	Rating    float64      `json:"rating"`
-	Comment   string       `json:"comment"`
-	Date      time.Time    `json:"date"`
+	PurchaseId int     `json:"purchase_id" binding:"required"`
+	Rating     float64 `json:"rating"`
+	Comment    string  `json:"comment"`
 }
 
 type Products struct {
@@ -79,7 +77,7 @@ func SellerScores(id int) ([]Scores, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), `
-		SELECT p.id, s.rating, s.comment , p.date
+		SELECT p.id, s.rating, s.comment
 		FROM scores s
 		JOIN purchases p ON s.purchase_id = p.id
 		WHERE p.seller_id = $1`, id)
@@ -90,8 +88,7 @@ func SellerScores(id int) ([]Scores, error) {
 
 	var scores []Scores
 	for rows.Next() {
-		var score Scores
-		err = rows.Scan(&score.ProductId, &score.Rating, &score.Comment, &score.Date)
+		score, err := scanComment(rows)
 		if err != nil {
 			return nil, err
 		}

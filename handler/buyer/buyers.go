@@ -74,8 +74,8 @@ func AddComment(ctx *gin.Context) {
 		})
 		return
 	}
-	score.ProductId = val.ID
-	res_score, err := db.CreateComment(score)
+	score.PurchaseId = val.ID
+	res_score, err := db.CreateComment(score, val.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get scores with error: " + err.Error(),
@@ -97,7 +97,6 @@ func UpdateComment(ctx *gin.Context) {
 		})
 		return
 	}
-	score.ProductId = val.ID
 
 	// Get the ID of the comment to update from the URL parameter
 	id, err := strconv.Atoi(ctx.Param("id"))
@@ -108,7 +107,7 @@ func UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	res_score, err := db.UpdateCommentDB(id, score)
+	res_score, err := db.UpdateCommentDB(id, val.ID, score)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update comment with error: " + err.Error(),
@@ -122,13 +121,14 @@ func UpdateComment(ctx *gin.Context) {
 }
 
 func DeleteComment(ctx *gin.Context) {
+	val := ctx.Value("user_info").(db.UserRet)
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid scores ID"})
 		return
 	}
 
-	scores, err := db.DeleteCommentDB(id)
+	scores, err := db.DeleteCommentDB(id, val.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get scores"})
 		return

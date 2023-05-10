@@ -2,15 +2,27 @@ package db
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/jackc/pgx/v5"
 )
 
+var ErrBadUser error = errors.New("the user have not access")
+
 func scanComment(rows pgx.Row) (Scores, error) {
 	var scores Scores
-	err := rows.Scan(&scores.ProductId, &scores.Rating, &scores.Comment)
+	err := rows.Scan(&scores.PurchaseId, &scores.Rating, &scores.Comment)
 	return scores, err
+}
+
+func checkUserBelongComment(user_id, purchase_id int) bool {
+	db := getConn()
+	var realUserId int
+	err := db.QueryRow(context.Background(), "SELECT buyer_id from purchases where purchase_id=$1", purchase_id).Scan(&realUserId)
+	if err != nil || realUserId != user_id {
+		return false
+	}
+	return true
 }
 
 func GetBuyerComments(buyer_id int) ([]Scores, error) {
@@ -36,28 +48,36 @@ func GetBuyerComments(buyer_id int) ([]Scores, error) {
 	return scores, nil
 }
 
-func CreateComment(score Scores) (Scores, error) {
+func CreateComment(score Scores, buyer_id int) (Scores, error) {
 	db := getConn()
-	fmt.Println(score)
+	if !checkUserBelongComment(buyer_id, score.PurchaseId) {
+		return score, ErrBadUser
+	}
 	row := db.QueryRow(context.Background(), "insert into score (purchase_id, rating, comment) value($1, $2, $3)",
-		score.ProductId, score.Rating, score.Comment)
+		score.PurchaseId, score.Rating, score.Comment)
 	score, err := scanComment(row)
 	return score, err
 }
 
-func UpdateCommentDB(id int, scores Scores) (Scores, error) {
+func UpdateCommentDB(purchase_id int, buyer_id int, scores Scores) (Scores, error) {
 	db := getConn()
 	var score Scores
-	row := db.QueryRow(context.Background(), "UPDATE scores SET rating=$2, comment=$3 WHERE purchase_id=$1 and purchase_id in (select id from purchase where buyer_id = $4) returning *",
-		score.ProductId, score.Rating, score.Comment, id)
+	if !checkUserBelongComment(buyer_id, purchase_id) {
+		return score, ErrBadUser
+	}
+	row := db.QueryRow(context.Background(), "UPDATE scores SET rating=$1, comment=$2 WHERE purchase_id=$3 returning *",
+		score.Rating, score.Comment, purchase_id)
 	score, err := scanComment(row)
-
 	return score, err
 }
 
-func DeleteCommentDB(id int) (Scores, error) {
+func DeleteCommentDB(purchase_id, buyer_id int) (Scores, error) {
 	db := getConn()
-	row := db.QueryRow(context.Background(), "DELETE FROM scores WHERE purchase_id in (select id from purchase where buyer_id = $1)", id)
+	var score Scores
+	if !checkUserBelongComment(buyer_id, purchase_id) {
+		return score, ErrBadUser
+	}
+	row := db.QueryRow(context.Background(), "DELETE FROM scores WHERE purchase_id = $1", purchase_id)
 	score, err := scanComment(row)
 	return score, err
 }
