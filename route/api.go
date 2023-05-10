@@ -14,10 +14,14 @@ func SetupAPI(address string) error {
 
 	publicRoutes := r.Group("/public")
 	{
-		publicRoutes.GET("/hello", public.Hello)
 		publicRoutes.GET("/sellers", public.ListOfAllSellers)
 		publicRoutes.GET("/sellers/:id/products", public.SellerProducts)
 		publicRoutes.GET("/sellers/:id/comments", public.SellersComments)
+
+		publicRoutes.GET("/products", public.ListOfAllProducts)
+		publicRoutes.GET("/products/search", public.SearchProducts)
+		publicRoutes.GET("/products/:id/sellers", public.ProductSellers)
+		publicRoutes.GET("/products/:id/comments", public.ProductsComments)
 	}
 
 	authRoutes := r.Group("/auth")
@@ -27,10 +31,9 @@ func SetupAPI(address string) error {
 
 	buyerRoutes := r.Group("/buyer", middleware.AuthoriseBuyer())
 	{
-		buyerRoutes.GET("/hello", public.Hello)
 		buyerRoutes.GET("/purchases", buyer.ListOfAllPurchases)
 		buyerRoutes.POST("/purchases/", buyer.AddPurchases)
-		
+
 		buyerRoutes.GET("/comments", buyer.GetComments)
 		buyerRoutes.POST("/comments/:id", buyer.AddComment)
 		buyerRoutes.PUT("/comments/:id", buyer.UpdateComment)

@@ -42,6 +42,7 @@ func GetBuyerComments(buyer_id int) ([]Comment, error) {
 		}
 		return nil, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		comment, err := scanComment(rows)
@@ -50,7 +51,9 @@ func GetBuyerComments(buyer_id int) ([]Comment, error) {
 		}
 		comments = append(comments, comment)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return comments, nil
 }
 
@@ -108,10 +111,34 @@ func SellerComments(seller_id int) ([]Comment, error) {
 		}
 		comments = append(comments, comment)
 	}
-	err = rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return comments, nil
+}
+
+func ProductComments(id int) ([]Comment, error) {
+	db := getConn()
+	rows, err := db.Query(context.Background(), `
+		SELECT s.purchase_id, s.rating, s.comment
+		FROM scores s
+				JOIN purchases p ON s.purchase_id = p.id
+		WHERE p.product_id=$1`, id)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
+	comments := make([]Comment, 0)
+	for rows.Next() {
+		comment, err := scanComment(rows)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return comments, nil
 }

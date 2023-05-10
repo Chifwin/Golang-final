@@ -16,6 +16,7 @@ func ListSellers() ([]Sellers, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var sellers []Sellers
 	for rows.Next() {

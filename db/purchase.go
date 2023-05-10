@@ -17,7 +17,6 @@ type Purchase struct {
 	Quantity  int       `json:"quantity" binding:"required"`
 }
 
-
 func scanPurchase(rows pgx.Row) (Purchase, error) {
 	var purchase Purchase
 	err := rows.Scan(&purchase.ID, &purchase.UserID, &purchase.ProductId, &purchase.SellerId, &purchase.Date, &purchase.Quantity)
@@ -35,6 +34,7 @@ func GetBuyerPurchases(buyer_id int) ([]Purchase, error) {
 		}
 		return nil, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		purchase, err := scanPurchase(rows)
