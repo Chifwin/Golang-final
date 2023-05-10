@@ -18,9 +18,7 @@ func ListOfAllSellers(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"sellers": sellers,
-	})
+	ctx.JSON(http.StatusOK, sellers)
 }
 
 func SellerProducts(ctx *gin.Context) {
@@ -40,9 +38,7 @@ func SellerProducts(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"products": products,
-	})
+	ctx.JSON(http.StatusOK, products)
 }
 
 func SellersComments(ctx *gin.Context) {
@@ -62,7 +58,5 @@ func SellersComments(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"comments": comments,
-	})
+	ctx.JSON(http.StatusOK, comments)
 }

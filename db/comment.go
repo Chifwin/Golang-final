@@ -100,7 +100,7 @@ func SellerComments(seller_id int) ([]Comment, error) {
 	}
 	defer rows.Close()
 
-	var comments []Comment
+	comments := make([]Comment, 0)
 	for rows.Next() {
 		comment, err := scanComment(rows)
 		if err != nil {
