@@ -38,7 +38,7 @@ drop table if exists products cascade;
 create table products
 (
     id          serial primary key,
-    name        varchar(255) not null,
+    name        varchar(255) not null unique,
     description text
 );
 

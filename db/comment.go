@@ -15,9 +15,9 @@ type Comment struct {
 
 var ErrBadUser error = errors.New("the user have not access")
 
-func scanComment(rows pgx.Row) (Comment, error) {
+func scanComment(row pgx.Row) (Comment, error) {
 	var comment Comment
-	err := rows.Scan(&comment.PurchaseId, &comment.Rating, &comment.Comment)
+	err := row.Scan(&comment.PurchaseId, &comment.Rating, &comment.Comment)
 	return comment, err
 }
 
@@ -35,26 +35,13 @@ func GetBuyerComments(buyer_id int) ([]Comment, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT * FROM scores WHERE purchase_id in (SELECT id FROM purchases where buyer_id=$1)", buyer_id)
-	comments := make([]Comment, 0)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return comments, nil
+			return make([]Comment, 0), nil
 		}
 		return nil, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		comment, err := scanComment(rows)
-		if err != nil {
-			return nil, err
-		}
-		comments = append(comments, comment)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return comments, nil
+	return scanManyData(rows, scanComment)
 }
 
 func CreateComment(purchase_id, buyer_id int, comment Comment) (Comment, error) {
@@ -64,8 +51,7 @@ func CreateComment(purchase_id, buyer_id int, comment Comment) (Comment, error) 
 	}
 	row := db.QueryRow(context.Background(), "insert into scores (purchase_id, rating, comment) values ($1, $2, $3) returning *",
 		purchase_id, comment.Rating, comment.Comment)
-	comment, err := scanComment(row)
-	return comment, err
+	return scanComment(row)
 }
 
 func UpdateComment(purchase_id, buyer_id int, comment Comment) (Comment, error) {
@@ -75,8 +61,7 @@ func UpdateComment(purchase_id, buyer_id int, comment Comment) (Comment, error) 
 	}
 	row := db.QueryRow(context.Background(), "UPDATE scores SET rating=$1, comment=$2 WHERE purchase_id=$3 returning *",
 		comment.Rating, comment.Comment, purchase_id)
-	comment, err := scanComment(row)
-	return comment, err
+	return scanComment(row)
 }
 
 func DeleteComment(purchase_id, buyer_id int) (Comment, error) {
@@ -86,8 +71,7 @@ func DeleteComment(purchase_id, buyer_id int) (Comment, error) {
 		return comment, ErrBadUser
 	}
 	row := db.QueryRow(context.Background(), "DELETE FROM scores WHERE purchase_id = $1 returning *", purchase_id)
-	comment, err := scanComment(row)
-	return comment, err
+	return scanComment(row)
 }
 
 func SellerComments(seller_id int) ([]Comment, error) {
@@ -101,20 +85,7 @@ func SellerComments(seller_id int) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	comments := make([]Comment, 0)
-	for rows.Next() {
-		comment, err := scanComment(rows)
-		if err != nil {
-			return nil, err
-		}
-		comments = append(comments, comment)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return comments, nil
+	return scanManyData(rows, scanComment)
 }
 
 func ProductComments(id int) ([]Comment, error) {
@@ -127,18 +98,5 @@ func ProductComments(id int) ([]Comment, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	comments := make([]Comment, 0)
-	for rows.Next() {
-		comment, err := scanComment(rows)
-		if err != nil {
-			return nil, err
-		}
-		comments = append(comments, comment)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return comments, nil
+	return scanManyData(rows, scanComment)
 }

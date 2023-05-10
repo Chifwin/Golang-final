@@ -21,3 +21,16 @@ func getConn() *pgx.Conn {
 	}
 	return postgres_conn
 }
+
+func scanManyData[T any](rows pgx.Rows, scanOne func(pgx.Row) (T, error)) ([]T, error) {
+	datas := make([]T, 0)
+	defer rows.Close()
+	for rows.Next() {
+		data, err := scanOne(rows)
+		if err != nil {
+			return nil, err
+		}
+		datas = append(datas, data)
+	}
+	return datas, rows.Err()
+}

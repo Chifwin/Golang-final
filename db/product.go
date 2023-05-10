@@ -28,34 +28,10 @@ func scanProductFromSeller(row pgx.Row) (ProductFromSeller, error) {
 	return product, err
 }
 
-func scanManyProductFromSeller(rows pgx.Rows) ([]ProductFromSeller, error) {
-	sellerProducts := make([]ProductFromSeller, 0)
-	for rows.Next() {
-		sellerProduct, err := scanProductFromSeller(rows)
-		if err != nil {
-			return nil, err
-		}
-		sellerProducts = append(sellerProducts, sellerProduct)
-	}
-	return sellerProducts, rows.Err()
-}
-
 func scanProduct(row pgx.Row) (Product, error) {
 	var product Product
 	err := row.Scan(&product.Id, &product.Name, &product.Description)
 	return product, err
-}
-
-func scanManyProduct(rows pgx.Rows) ([]Product, error) {
-	products := make([]Product, 0)
-	for rows.Next() {
-		product, err := scanProduct(rows)
-		if err != nil {
-			return nil, err
-		}
-		products = append(products, product)
-	}
-	return products, nil
 }
 
 func ProductSellers(product_id int) ([]ProductFromSeller, error) {
@@ -69,13 +45,7 @@ func ProductSellers(product_id int) ([]ProductFromSeller, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	sellerProducts, err := scanManyProductFromSeller(rows)
-	if err != nil {
-		return nil, err
-	}
-	return sellerProducts, nil
+	return scanManyData(rows, scanProductFromSeller)
 }
 
 func ListProducts() ([]Product, error) {
@@ -85,12 +55,7 @@ func ListProducts() ([]Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	products, err := scanManyProduct(rows)
-	if err != nil {
-		return nil, err
-	}
-	return products, nil
+	return scanManyData(rows, scanProduct)
 }
 
 func SearchProduct(name string) ([]Product, error) {
@@ -99,32 +64,35 @@ func SearchProduct(name string) ([]Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	products, err := scanManyProduct(rows)
-	if err != nil {
-		return nil, err
-	}
-	return products, nil
+	return scanManyData(rows, scanProduct)
 }
 
-func SellerProducts(seller_id int) ([]ProductFromSeller, error) {
+// Add Update
+func AddProduct(product Product) (Product, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "insert into products(name, description) values ($1, $2) returning *", product.Name, product.Description)
+	return scanProduct(row)
+}
+
+func UpdateProduct(product_id int, product Product) (Product, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "update product set name = $1, description = $2 where product_id = $3 returning *", product.Name, product.Description, product_id)
+	return scanProduct(row)
+}
+
+// Seller part
+func SellerProducts(seller_id int, show_published bool) ([]ProductFromSeller, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), `
         SELECT ps.product_id, ps.seller_id, ps.quantity, ps.cost, ps.published
         FROM product_seller ps
         JOIN users u ON ps.seller_id = u.id
-        WHERE u.id = $1`, seller_id)
+        WHERE u.id = $1 and ps.published = $1`, seller_id, show_published)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	sellerProducts, err := scanManyProductFromSeller(rows)
-	if err != nil {
-		return nil, err
-	}
-	return sellerProducts, nil
+	return scanManyData(rows, scanProductFromSeller)
 }
 
 func UpdateSellerProduct(seller_id, product_id int, product ProductFromSeller) (ProductFromSeller, error) {
@@ -139,15 +107,13 @@ func UpdateSellerProduct(seller_id, product_id int, product ProductFromSeller) (
 		statement = "update product_seller set quantity = $1, cost = $2, published = $5 where product_id = $3 and seller_id = $4 returning *"
 	}
 	row := db.QueryRow(context.Background(), statement, product.Quantity, product.Cost, product_id, seller_id, product.Published)
-	product, err = scanProductFromSeller(row)
-	return product, err
+	return scanProductFromSeller(row)
 }
 
 func DeleteSellerProduct(product_id, seller_id int) (ProductFromSeller, error) {
 	db := getConn()
 	row := db.QueryRow(context.Background(), "delete from product_seller WHERE product_id = $1 and seller_id = $2 returning *", product_id, seller_id)
-	product, err := scanProductFromSeller(row)
-	return product, err
+	return scanProductFromSeller(row)
 }
 
 func PublishSellerProduct(product_id, seller_id int, value, inverse bool) (ProductFromSeller, error) {
@@ -158,6 +124,5 @@ func PublishSellerProduct(product_id, seller_id int, value, inverse bool) (Produ
 	}
 	query := fmt.Sprintf("update product_seller set published = %s where product_id = %d and seller_id = %d returning *\n", statement_value, product_id, seller_id)
 	row := db.QueryRow(context.Background(), query)
-	product, err := scanProductFromSeller(row)
-	return product, err
+	return scanProductFromSeller(row)
 }

@@ -27,24 +27,13 @@ func filterPurchases(condition string) ([]Purchase, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT * FROM purchases where "+condition)
-	purchases := make([]Purchase, 0)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return purchases, nil
+			return make([]Purchase, 0), nil
 		}
 		return nil, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		purchase, err := scanPurchase(rows)
-		if err != nil {
-			return nil, err
-		}
-		purchases = append(purchases, purchase)
-	}
-
-	return purchases, nil
+	return scanManyData(rows, scanPurchase)
 }
 
 func BuyerPurchases(buyer_id int) ([]Purchase, error) {

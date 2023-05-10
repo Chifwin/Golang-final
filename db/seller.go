@@ -2,31 +2,27 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5"
 )
 
-type Sellers struct {
+type Seller struct {
 	ID   int
 	Name string
 }
 
-func ListSellers() ([]Sellers, error) {
+func scanSeller(row pgx.Row) (Seller, error) {
+	var seller Seller
+	err := row.Scan(&seller.ID, &seller.Name)
+	return seller, err
+}
+
+func ListSellers() ([]Seller, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT id, name FROM users WHERE role = $1", SELLER)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var sellers []Sellers
-	for rows.Next() {
-		var seller Sellers
-		err = rows.Scan(&seller.ID, &seller.Name)
-		if err != nil {
-			return nil, err
-		}
-		sellers = append(sellers, seller)
-	}
-
-	return sellers, nil
+	return scanManyData(rows, scanSeller)
 }

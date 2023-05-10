@@ -13,7 +13,7 @@ func Products(ctx *gin.Context) {
 	user_info := ctx.Value("user_info").(db.UserRet)
 	sellerID := user_info.ID
 
-	products, err := db.SellerProducts(sellerID)
+	products, err := db.SellerProducts(sellerID, true)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller products not found"})

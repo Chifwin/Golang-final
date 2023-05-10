@@ -28,7 +28,7 @@ func SellerProducts(ctx *gin.Context) {
 		return
 	}
 
-	products, err := db.SellerProducts(sellerID)
+	products, err := db.SellerProducts(sellerID, false)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller products not found"})

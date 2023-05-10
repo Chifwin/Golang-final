@@ -2,7 +2,8 @@ package db
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type UserRole string
@@ -13,6 +14,13 @@ const (
 	BUYER  UserRole = "buyer"
 )
 
+type UserCred struct {
+	Username string   `json:"username"  binding:"required"`
+	Name     string   `json:"name"  binding:"required"`
+	Role     UserRole `json:"role"  binding:"required"`
+	Password string   `json:"password"  binding:"required"`
+}
+
 type UserRet struct {
 	ID       int
 	Username string
@@ -20,11 +28,10 @@ type UserRet struct {
 	Role     UserRole
 }
 
-type UserCred struct {
-	Username string
-	Name     string
-	Role     UserRole
-	Password string
+func scanUserRet(row pgx.Row) (UserRet, error) {
+	var user UserRet
+	err := row.Scan(&user.ID, user.Username, user.Name, user.Role)
+	return user, err
 }
 
 func AddUser(user UserCred) error {
@@ -33,13 +40,17 @@ func AddUser(user UserCred) error {
 	return err
 }
 
-func AuthoriseUser(username, password string) (*UserRet, error) {
-	var res UserRet
+func AuthoriseUser(username, password string) (UserRet, error) {
 	db := getConn()
-	fmt.Printf("Login with username: %s and password %s\n", username, password)
-	err := db.QueryRow(context.Background(), "select * from authorise_user($1, $2)", username, password).Scan(&res.ID, &res.Username, &res.Name, &res.Role)
+	row := db.QueryRow(context.Background(), "select * from authorise_user($1, $2)", username, password)
+	return scanUserRet(row)
+}
+
+func GetAllUsers() ([]UserRet, error) {
+	db := getConn()
+	rows, err := db.Query(context.Background(), "select id, username, name, role from users")
 	if err != nil {
 		return nil, err
 	}
-	return &res, nil
+	return scanManyData(rows, scanUserRet)
 }

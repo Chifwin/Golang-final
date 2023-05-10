@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"database/sql"
+	"fmt"
 	"golang-final/db"
 	"net/http"
 
@@ -21,7 +22,7 @@ func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 			return
 		}
 		user_info, err := db.AuthoriseUser(username, password)
-		if err != nil || user_info == nil {
+		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"error": "No user with this credintails",
@@ -39,7 +40,8 @@ func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 			})
 			return
 		}
-		ctx.Set("user_info", *user_info)
+		fmt.Printf("Login with username: %s and password %s\n", username, password)
+		ctx.Set("user_info", user_info)
 	}
 }
 
