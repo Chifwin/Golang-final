@@ -34,7 +34,7 @@ func AddPurchases(ctx *gin.Context) {
 		return
 	}
 	purchase.UserID = user_info.ID
-	res_purchase, err := db.CreatePurchase(purchase)
+	purchase, err := db.Buy(purchase)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get purchases with error: " + err.Error(),
@@ -42,9 +42,7 @@ func AddPurchases(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"purchase": res_purchase,
-	})
+	ctx.JSON(http.StatusOK, purchase)
 }
 
 // Comment

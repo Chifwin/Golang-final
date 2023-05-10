@@ -9,8 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const anyRole db.UserRole = "any"
-
 func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		username := ctx.GetHeader("username")
@@ -34,7 +32,7 @@ func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 			}
 			return
 		}
-		if role != anyRole && role != user_info.Role {
+		if role != db.ANY_ROLE && role != user_info.Role {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "User must have role: " + role,
 			})
@@ -46,7 +44,7 @@ func authorizeWithRole(role db.UserRole) gin.HandlerFunc {
 }
 
 func Authorise() gin.HandlerFunc {
-	return authorizeWithRole(anyRole)
+	return authorizeWithRole(db.ANY_ROLE)
 }
 
 func AuthoriseAdmin() gin.HandlerFunc {

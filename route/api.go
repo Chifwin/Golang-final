@@ -1,6 +1,7 @@
 package route
 
 import (
+	"golang-final/handler/admin"
 	"golang-final/handler/buyer"
 	"golang-final/handler/public"
 	"golang-final/handler/seller"
@@ -53,7 +54,14 @@ func SetupAPI(address string) error {
 
 	adminRoutes := r.Group("/admin", middleware.AuthoriseAdmin())
 	{
-		adminRoutes.GET("/hello", public.Hello)
+		adminRoutes.GET("/users", admin.ListUsers)
+		adminRoutes.POST("/users/:role", admin.RegisterUser)
+		adminRoutes.DELETE("/users/:id", admin.DeleteUser)
+
+		adminRoutes.POST("/products", admin.AddProduct)
+		adminRoutes.PUT("/products/:id", admin.UpdateProduct)
+
+		adminRoutes.GET("/purchases", admin.ListLastPurchases)
 	}
 
 	return r.Run(address)

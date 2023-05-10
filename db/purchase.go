@@ -25,7 +25,6 @@ func scanPurchase(rows pgx.Row) (Purchase, error) {
 
 func filterPurchases(condition string) ([]Purchase, error) {
 	db := getConn()
-
 	rows, err := db.Query(context.Background(), "SELECT * FROM purchases where "+condition)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -44,11 +43,19 @@ func SellerPurchases(seller_id int) ([]Purchase, error) {
 	return filterPurchases(fmt.Sprintf("seller_id = %d", seller_id))
 }
 
-func CreatePurchase(purchase Purchase) (Purchase, error) {
+func Buy(purchase Purchase) (Purchase, error) {
 	db := getConn()
-	fmt.Println(purchase)
 	row := db.QueryRow(context.Background(), "select * from buy($1, $2, $3, $4)",
 		purchase.UserID, purchase.SellerId, purchase.ProductId, purchase.Quantity)
 	purchase, err := scanPurchase(row)
 	return purchase, err
+}
+
+func LastPurchases() ([]Purchase, error) {
+	db := getConn()
+	rows, err := db.Query(context.Background(), "select * from purchases order by date desc ")
+	if err != nil {
+		return nil, err
+	}
+	return scanManyData(rows, scanPurchase)
 }

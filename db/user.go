@@ -12,20 +12,35 @@ const (
 	ADMIN  UserRole = "admin"
 	SELLER UserRole = "seller"
 	BUYER  UserRole = "buyer"
+
+	// Not in database
+	NO_ROLE  UserRole = ""
+	ANY_ROLE UserRole = "any"
 )
 
+var ROLES [3]UserRole = [...]UserRole{ADMIN, SELLER, BUYER}
+
+func ValidRole(s string) (UserRole, bool) {
+	for _, role := range ROLES {
+		if s == string(role) {
+			return role, true
+		}
+	}
+	return NO_ROLE, false
+}
+
 type UserCred struct {
-	Username string   `json:"username"  binding:"required"`
-	Name     string   `json:"name"  binding:"required"`
-	Role     UserRole `json:"role"  binding:"required"`
-	Password string   `json:"password"  binding:"required"`
+	Username string   `json:"username" binding:"required"`
+	Name     string   `json:"name" binding:"required"`
+	Role     UserRole `json:"role"`
+	Password string   `json:"password" binding:"required"`
 }
 
 type UserRet struct {
-	ID       int
-	Username string
-	Name     string
-	Role     UserRole
+	ID       int      `json:"id"`
+	Username string   `json:"username"`
+	Name     string   `json:"name"`
+	Role     UserRole `json:"role"`
 }
 
 func scanUserRet(row pgx.Row) (UserRet, error) {
@@ -53,4 +68,10 @@ func GetAllUsers() ([]UserRet, error) {
 		return nil, err
 	}
 	return scanManyData(rows, scanUserRet)
+}
+
+func DeleteUser(user_id int) (UserRet, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "delete from users where id = $1 returning *", user_id)
+	return scanUserRet(row)
 }
