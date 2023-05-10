@@ -11,8 +11,8 @@ import (
 )
 
 func ListOfAllPurchases(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
-	purchases, err := db.GetBuyerPurchases(val.ID)
+	user_info := ctx.Value("user_info").(db.UserRet)
+	purchases, err := db.BuyerPurchases(user_info.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -25,7 +25,7 @@ func ListOfAllPurchases(ctx *gin.Context) {
 }
 
 func AddPurchases(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
+	user_info := ctx.Value("user_info").(db.UserRet)
 	var purchase db.Purchase
 	if err := ctx.ShouldBindJSON(&purchase); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -33,7 +33,7 @@ func AddPurchases(ctx *gin.Context) {
 		})
 		return
 	}
-	purchase.UserID = val.ID
+	purchase.UserID = user_info.ID
 	res_purchase, err := db.CreatePurchase(purchase)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -49,8 +49,8 @@ func AddPurchases(ctx *gin.Context) {
 
 // Comment
 func GetComments(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
-	comments, err := db.GetBuyerComments(val.ID)
+	user_info := ctx.Value("user_info").(db.UserRet)
+	comments, err := db.GetBuyerComments(user_info.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -63,7 +63,7 @@ func GetComments(ctx *gin.Context) {
 }
 
 func AddComment(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
+	user_info := ctx.Value("user_info").(db.UserRet)
 	var comment db.Comment
 	if err := ctx.ShouldBindJSON(&comment); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -79,7 +79,7 @@ func AddComment(ctx *gin.Context) {
 		})
 		return
 	}
-	res_comment, err := db.CreateComment(purchase_id, val.ID, comment)
+	res_comment, err := db.CreateComment(purchase_id, user_info.ID, comment)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get comments with error: " + err.Error(),
@@ -91,7 +91,7 @@ func AddComment(ctx *gin.Context) {
 }
 
 func UpdateComment(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
+	user_info := ctx.Value("user_info").(db.UserRet)
 	var comment db.Comment
 	if err := ctx.ShouldBindJSON(&comment); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -109,7 +109,7 @@ func UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	res_comment, err := db.UpdateComment(purchase_id, val.ID, comment)
+	res_comment, err := db.UpdateComment(purchase_id, user_info.ID, comment)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update comment with error: " + err.Error(),
@@ -121,14 +121,14 @@ func UpdateComment(ctx *gin.Context) {
 }
 
 func DeleteComment(ctx *gin.Context) {
-	val := ctx.Value("user_info").(db.UserRet)
+	user_info := ctx.Value("user_info").(db.UserRet)
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid comment ID"})
 		return
 	}
 
-	comment, err := db.DeleteComment(id, val.ID)
+	comment, err := db.DeleteComment(id, user_info.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get comment with error: " + err.Error()})
 		return

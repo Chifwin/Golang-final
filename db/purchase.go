@@ -23,10 +23,10 @@ func scanPurchase(rows pgx.Row) (Purchase, error) {
 	return purchase, err
 }
 
-func GetBuyerPurchases(buyer_id int) ([]Purchase, error) {
+func filterPurchases(condition string) ([]Purchase, error) {
 	db := getConn()
 
-	rows, err := db.Query(context.Background(), "SELECT * FROM purchases where buyer_id=$1", buyer_id)
+	rows, err := db.Query(context.Background(), "SELECT * FROM purchases where "+condition)
 	purchases := make([]Purchase, 0)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -45,6 +45,14 @@ func GetBuyerPurchases(buyer_id int) ([]Purchase, error) {
 	}
 
 	return purchases, nil
+}
+
+func BuyerPurchases(buyer_id int) ([]Purchase, error) {
+	return filterPurchases(fmt.Sprintf("buyer_id = %d", buyer_id))
+}
+
+func SellerPurchases(seller_id int) ([]Purchase, error) {
+	return filterPurchases(fmt.Sprintf("seller_id = %d", seller_id))
 }
 
 func CreatePurchase(purchase Purchase) (Purchase, error) {
