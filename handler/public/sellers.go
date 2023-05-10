@@ -45,24 +45,24 @@ func SellerProducts(ctx *gin.Context) {
 	})
 }
 
-func SellersScores(ctx *gin.Context) {
+func SellersComments(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid seller ID"})
 		return
 	}
 
-	scores, err := db.SellerScores(id)
+	comments, err := db.SellerComments(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller scores not found"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Seller comments not found"})
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get seller scores"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get seller comments"})
 		}
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"scores": scores,
+		"comments": comments,
 	})
 }

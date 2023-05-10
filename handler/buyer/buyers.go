@@ -2,6 +2,7 @@ package buyer
 
 import (
 	// "database/sql"
+
 	"golang-final/db"
 	"net/http"
 	"strconv"
@@ -20,9 +21,7 @@ func ListOfAllPurchases(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"purchases": purchases,
-	})
+	ctx.JSON(http.StatusOK, purchases)
 }
 
 func AddPurchases(ctx *gin.Context) {
@@ -49,49 +48,52 @@ func AddPurchases(ctx *gin.Context) {
 }
 
 // Comment
-func GetComment(ctx *gin.Context) {
+func GetComments(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
-	scores, err := db.GetBuyerComments(val.ID)
+	comments, err := db.GetBuyerComments(val.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get scores",
+			"error": "Failed to get comments with error: " + err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"scores": scores,
-	})
+	ctx.JSON(http.StatusOK, comments)
 }
 
 func AddComment(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
-	var score db.Scores
-	if err := ctx.ShouldBindJSON(&score); err != nil {
+	var comment db.Comment
+	if err := ctx.ShouldBindJSON(&comment); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No data provided",
 		})
 		return
 	}
-	score.PurchaseId = val.ID
-	res_score, err := db.CreateComment(score, val.ID)
+	// Get the ID of the comment to update from the URL parameter
+	purchase_id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid comment ID",
+		})
+		return
+	}
+	res_comment, err := db.CreateComment(purchase_id, val.ID, comment)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get scores with error: " + err.Error(),
+			"error": "Failed to get comments with error: " + err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"score": res_score,
-	})
+	ctx.JSON(http.StatusOK, res_comment)
 }
 
 func UpdateComment(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
-	var score db.Scores
-	if err := ctx.ShouldBindJSON(&score); err != nil {
+	var comment db.Comment
+	if err := ctx.ShouldBindJSON(&comment); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No data provided",
 		})
@@ -99,7 +101,7 @@ func UpdateComment(ctx *gin.Context) {
 	}
 
 	// Get the ID of the comment to update from the URL parameter
-	id, err := strconv.Atoi(ctx.Param("id"))
+	purchase_id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid comment ID",
@@ -107,7 +109,7 @@ func UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	res_score, err := db.UpdateCommentDB(id, val.ID, score)
+	res_comment, err := db.UpdateComment(purchase_id, val.ID, comment)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update comment with error: " + err.Error(),
@@ -115,26 +117,22 @@ func UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"score": res_score,
-	})
+	ctx.JSON(http.StatusOK, res_comment)
 }
 
 func DeleteComment(ctx *gin.Context) {
 	val := ctx.Value("user_info").(db.UserRet)
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid scores ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid comment ID"})
 		return
 	}
 
-	scores, err := db.DeleteCommentDB(id, val.ID)
+	comment, err := db.DeleteComment(id, val.ID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get scores"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get comment with error: " + err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"scores": scores,
-	})
+	ctx.JSON(http.StatusOK, comment)
 }

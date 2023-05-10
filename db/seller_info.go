@@ -9,11 +9,7 @@ type Sellers struct {
 	Name string
 }
 
-type Scores struct {
-	PurchaseId int     `json:"purchase_id" binding:"required"`
-	Rating     float64 `json:"rating"`
-	Comment    string  `json:"comment"`
-}
+
 
 type Products struct {
 	ProductId int     `json:"productId"`
@@ -71,33 +67,4 @@ func SellerProducts(id int) ([]Products, error) {
 
 	return sellerProducts, nil
 
-}
-
-func SellerScores(id int) ([]Scores, error) {
-	db := getConn()
-
-	rows, err := db.Query(context.Background(), `
-		SELECT p.id, s.rating, s.comment
-		FROM scores s
-		JOIN purchases p ON s.purchase_id = p.id
-		WHERE p.seller_id = $1`, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var scores []Scores
-	for rows.Next() {
-		score, err := scanComment(rows)
-		if err != nil {
-			return nil, err
-		}
-		scores = append(scores, score)
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-
-	return scores, nil
 }
