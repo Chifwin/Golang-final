@@ -41,8 +41,7 @@ func Buy(purchase Purchase) (Purchase, error) {
 	db := getConn()
 	row := db.QueryRow(context.Background(), "select * from buy($1, $2, $3, $4)",
 		purchase.UserID, purchase.SellerId, purchase.ProductId, purchase.Quantity)
-	purchase, err := scanPurchase(row)
-	return purchase, err
+	return scanPurchase(row)
 }
 
 func LastPurchases() ([]Purchase, error) {
