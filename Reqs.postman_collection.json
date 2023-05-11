@@ -1,0 +1,1025 @@
+{
+	"info": {
+		"_postman_id": "77a5bd24-9c94-4fcf-8541-93b29cbf2572",
+		"name": "Reqs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26770760",
+		"_collection_link": "https://dark-satellite-588362.postman.co/workspace/Golang-final-project~e9173889-be89-40dc-9fe0-e6c8520ce44d/collection/26770760-77a5bd24-9c94-4fcf-8541-93b29cbf2572?action=share&creator=26770760&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Buyer",
+			"item": [
+				{
+					"name": "Buyer purchases",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/purchases",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List buyer's comments",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"purchase_id\":1,\r\n    \"rating\":2,\r\n    \"comment\":\"comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/comments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\": 2,\r\n    \"seller_id\": 14,\r\n    \"quantity\": 9\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/purchases",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\":2,\r\n    \"comment\":\"UPD\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/comments/3",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"comments",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update comment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\":2,\r\n    \"comment\":\"UPD\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/comments/2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"comments",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "username",
+								"value": "buyer",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/buyer/comments/2",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"buyer",
+								"comments",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "List sellers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/sellers",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"sellers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Seller's comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/sellers/14/comments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"sellers",
+								"14",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Seller's products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/sellers/21/products",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"sellers",
+								"21",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/products",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/products/search?name=first",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "first"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product's comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/products/1/comments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"products",
+								"1",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product's sellers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/public/products/1/sellers",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"public",
+								"products",
+								"1",
+								"sellers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller",
+			"item": [
+				{
+					"name": "List products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "seller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/seller/products",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"seller",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List purchases",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "seller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/seller/purchases",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"seller",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "username",
+								"value": "seller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"quantity\": 10,\r\n    \"cost\": 100,\r\n    \"published\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/seller/products/1",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"seller",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "username",
+								"value": "seller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/seller/products/1",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"seller",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "username",
+								"value": "seller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/seller/products/2/publish",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"seller",
+								"products",
+								"2",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "List users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"New seller\",\r\n    \"password\": \"2\",\r\n    \"username\": \"chiefseller\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/users/seller",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"seller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"New admin\",\r\n    \"password\": \"2\",\r\n    \"username\": \"chif\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/users/20",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"bread\",\r\n    \"description\": \"tasty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/products",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"bread\",\r\n    \"description\": \"Very very tasty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/products/5",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"products",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List last purchases",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/purchases",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"admin",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "username",
+								"value": "user",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "password",
+								"value": "1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"New seller\",\r\n    \"password\": \"2\",\r\n    \"username\": \"chiefseller\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update current user info",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "username",
+								"value": "chiefseller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "2",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"MOST great seller\",\r\n    \"password\": \"2\",\r\n    \"username\": \"chiefseller\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete current user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "username",
+								"value": "chiefseller",
+								"type": "text"
+							},
+							{
+								"key": "password",
+								"value": "2",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"MOST great seller\",\r\n    \"password\": \"2\",\r\n    \"username\": \"chiefseller\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Hello",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hello authorized",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "username",
+						"value": "user",
+						"type": "text"
+					},
+					{
+						"key": "password",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/auth/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
