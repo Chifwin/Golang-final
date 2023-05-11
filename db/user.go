@@ -49,10 +49,28 @@ func scanUserRet(row pgx.Row) (UserRet, error) {
 	return user, err
 }
 
-func AddUser(user UserCred) error {
+func GetUser(user_id int) (UserRet, error) {
 	db := getConn()
-	_, err := db.Exec(context.Background(), "call add_user($1, $2, $3, $4)", user.Username, user.Password, user.Password, user.Role)
-	return err
+	row := db.QueryRow(context.Background(), "select id, username, name, role from users where id = $1", user_id)
+	return scanUserRet(row)
+}
+
+func AddUser(user UserCred) (UserRet, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "insert into users (username, password, name, role) values ($1, $2, $3, $4) returning id, username, name, role", user.Username, user.Password, user.Name, user.Role)
+	return scanUserRet(row)
+}
+
+func UpdateUser(user_id int, user UserCred) (UserRet, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "update users set username = $1, password = $2, name = $3 where id = $4 returning id, username, name, role", user.Username, user.Password, user.Name, user_id)
+	return scanUserRet(row)
+}
+
+func DeleteUser(user_id int) (UserRet, error) {
+	db := getConn()
+	row := db.QueryRow(context.Background(), "delete from users where id = $1 returning id, username, name, role", user_id)
+	return scanUserRet(row)
 }
 
 func AuthoriseUser(username, password string) (UserRet, error) {
@@ -68,10 +86,4 @@ func GetAllUsers() ([]UserRet, error) {
 		return nil, err
 	}
 	return scanManyData(rows, scanUserRet)
-}
-
-func DeleteUser(user_id int) (UserRet, error) {
-	db := getConn()
-	row := db.QueryRow(context.Background(), "delete from users where id = $1 returning id, username, name, role", user_id)
-	return scanUserRet(row)
 }

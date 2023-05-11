@@ -91,15 +91,14 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 	user.Role = role
-	if err := db.AddUser(user); err != nil {
+	new_user, err := db.AddUser(user)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add user with error: " + err.Error(),
 		})
 		return
 	}
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"message": "Succesfulli created",
-	})
+	ctx.JSON(http.StatusAccepted, new_user)
 }
 
 func DeleteUser(ctx *gin.Context) {

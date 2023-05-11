@@ -18,10 +18,25 @@ create table users
     name     varchar(100) not null,
     role     user_role
 );
+create or replace function crypt_user_password() returns trigger as
+$$
+begin
+    new.password = crypt(new.password, gen_salt('bf'));
+    return new;
+end;
+$$
+    language plpgsql;
+
+create or replace trigger crypt_user_password_tg
+    before update or insert
+    on users
+    for each row
+execute function crypt_user_password();
+
 create or replace function restrict_user_role_change() returns trigger as
 $$
 begin
-    if (new.role != old.role) then
+    if (new.role <> old.role) then
         raise exception 'users can not change roles';
     end if;
     return new;
