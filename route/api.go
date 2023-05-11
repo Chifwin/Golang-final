@@ -7,12 +7,16 @@ import (
 	"golang-final/handler/public"
 	"golang-final/handler/seller"
 	"golang-final/middleware"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupAPI(address string) error {
-	r := gin.Default()
+	if os.Getenv("RELEASE") == "true" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	r := gin.New()
 	r.GET("/", public.Hello)
 
 	publicRoutes := r.Group("/public")
