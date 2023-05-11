@@ -39,7 +39,7 @@ func SetupAPI(address string) error {
 	buyerRoutes := r.Group("/buyer", middleware.AuthoriseBuyer())
 	{
 		buyerRoutes.GET("/purchases", buyer.ListOfAllPurchases)
-		buyerRoutes.POST("/purchases/", buyer.AddPurchases)
+		buyerRoutes.POST("/purchases/", buyer.Buy)
 
 		buyerRoutes.GET("/comments", buyer.GetComments)
 		buyerRoutes.POST("/comments/:id", buyer.AddComment)

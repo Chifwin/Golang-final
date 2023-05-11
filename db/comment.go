@@ -18,7 +18,7 @@ var ErrBadUser error = errors.New("the user have not access")
 func scanComment(row pgx.Row) (Comment, error) {
 	var comment Comment
 	err := row.Scan(&comment.PurchaseId, &comment.Rating, &comment.Comment)
-	return comment, err
+	return comment, handleError(err)
 }
 
 func checkUserBelongComment(user_id, purchase_id int) bool {
@@ -35,13 +35,7 @@ func GetBuyerComments(buyer_id int) ([]Comment, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT * FROM scores WHERE purchase_id in (SELECT id FROM purchases where buyer_id=$1)", buyer_id)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			return make([]Comment, 0), nil
-		}
-		return nil, err
-	}
-	return scanManyData(rows, scanComment)
+	return scanManyData(rows, err, scanComment)
 }
 
 func CreateComment(purchase_id, buyer_id int, comment Comment) (Comment, error) {
@@ -82,10 +76,7 @@ func SellerComments(seller_id int) ([]Comment, error) {
 		FROM scores s
 		JOIN purchases p ON s.purchase_id = p.id
 		WHERE p.seller_id = $1`, seller_id)
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanComment)
+	return scanManyData(rows, err, scanComment)
 }
 
 func ProductComments(id int) ([]Comment, error) {
@@ -95,8 +86,5 @@ func ProductComments(id int) ([]Comment, error) {
 		FROM scores s
 				JOIN purchases p ON s.purchase_id = p.id
 		WHERE p.product_id=$1`, id)
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanComment)
+	return scanManyData(rows, err, scanComment)
 }

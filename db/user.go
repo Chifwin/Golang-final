@@ -46,7 +46,7 @@ type UserRet struct {
 func scanUserRet(row pgx.Row) (UserRet, error) {
 	var user UserRet
 	err := row.Scan(&user.ID, &user.Username, &user.Name, &user.Role)
-	return user, err
+	return user, handleError(err)
 }
 
 func GetUser(user_id int) (UserRet, error) {
@@ -82,8 +82,5 @@ func AuthoriseUser(username, password string) (UserRet, error) {
 func GetAllUsers() ([]UserRet, error) {
 	db := getConn()
 	rows, err := db.Query(context.Background(), "select id, username, name, role from users")
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanUserRet)
+	return scanManyData(rows, err, scanUserRet)
 }

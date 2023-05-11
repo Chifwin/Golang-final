@@ -25,13 +25,13 @@ type Product struct {
 func scanProductFromSeller(row pgx.Row) (ProductFromSeller, error) {
 	var product ProductFromSeller
 	err := row.Scan(&product.ProductId, &product.SellerId, &product.Quantity, &product.Cost, &product.Published)
-	return product, err
+	return product, handleError(err)
 }
 
 func scanProduct(row pgx.Row) (Product, error) {
 	var product Product
 	err := row.Scan(&product.Id, &product.Name, &product.Description)
-	return product, err
+	return product, handleError(err)
 }
 
 func ProductSellers(product_id int) ([]ProductFromSeller, error) {
@@ -42,29 +42,20 @@ func ProductSellers(product_id int) ([]ProductFromSeller, error) {
 	FROM product_seller ps
 		JOIN users u ON ps.seller_id = u.id
 	WHERE ps.product_id = $1 and published = true`, product_id)
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanProductFromSeller)
+	return scanManyData(rows, err, scanProductFromSeller)
 }
 
 func ListProducts() ([]Product, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT * FROM products")
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanProduct)
+	return scanManyData(rows, err, scanProduct)
 }
 
 func SearchProduct(name string) ([]Product, error) {
 	db := getConn()
 	rows, err := db.Query(context.Background(), fmt.Sprintf("SELECT * FROM products WHERE name LIKE '%%%s%%'", name))
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanProduct)
+	return scanManyData(rows, err, scanProduct)
 }
 
 // Add Update
@@ -89,10 +80,7 @@ func SellerProducts(seller_id int, show_not_published bool) ([]ProductFromSeller
         FROM product_seller ps
         JOIN users u ON ps.seller_id = u.id
         WHERE u.id = $1 and (ps.published or ps.published = $2)`, seller_id, !show_not_published)
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanProductFromSeller)
+	return scanManyData(rows, err, scanProductFromSeller)
 }
 
 func UpdateSellerProduct(seller_id, product_id int, product ProductFromSeller) (ProductFromSeller, error) {

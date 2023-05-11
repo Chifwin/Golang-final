@@ -24,7 +24,7 @@ func ListOfAllPurchases(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, purchases)
 }
 
-func AddPurchases(ctx *gin.Context) {
+func Buy(ctx *gin.Context) {
 	user_info := ctx.Value("user_info").(db.UserRet)
 	var purchase db.Purchase
 	if err := ctx.ShouldBindJSON(&purchase); err != nil {
@@ -36,6 +36,12 @@ func AddPurchases(ctx *gin.Context) {
 	purchase.UserID = user_info.ID
 	purchase, err := db.Buy(purchase)
 	if err != nil {
+		if err == db.ErrBuyError {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get purchases with error: " + err.Error(),
 		})
@@ -72,6 +78,12 @@ func AddComment(ctx *gin.Context) {
 	// Get the ID of the comment to update from the URL parameter
 	purchase_id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Comment to the purchase already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid comment ID",
 		})

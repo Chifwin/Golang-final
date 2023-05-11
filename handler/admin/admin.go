@@ -18,6 +18,12 @@ func AddProduct(ctx *gin.Context) {
 	}
 	product, err := db.AddProduct(product)
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Product with this name already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add product with error: " + err.Error(),
 		})
@@ -45,6 +51,12 @@ func UpdateProduct(ctx *gin.Context) {
 
 	product, err = db.UpdateProduct(product_id, product)
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Product with this name already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update product with error: " + err.Error(),
 		})
@@ -93,6 +105,12 @@ func RegisterUser(ctx *gin.Context) {
 	user.Role = role
 	new_user, err := db.AddUser(user)
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "User with this username already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add user with error: " + err.Error(),
 		})

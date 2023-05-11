@@ -14,15 +14,12 @@ type Seller struct {
 func scanSeller(row pgx.Row) (Seller, error) {
 	var seller Seller
 	err := row.Scan(&seller.ID, &seller.Name)
-	return seller, err
+	return seller, handleError(err)
 }
 
 func ListSellers() ([]Seller, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), "SELECT id, name FROM users WHERE role = $1", SELLER)
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanSeller)
+	return scanManyData(rows, err, scanSeller)
 }

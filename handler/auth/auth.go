@@ -18,6 +18,12 @@ func RegisterBuyer(ctx *gin.Context) {
 	user.Role = db.BUYER
 	new_user, err := db.AddUser(user)
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "User with this username already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add user with error: " + err.Error(),
 		})
@@ -49,6 +55,12 @@ func UpdateUser(ctx *gin.Context) {
 	}
 	new_user, err := db.UpdateUser(user_info.ID, user)
 	if err != nil {
+		if err == db.ErrUniqueFailed {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "User with this username already exist",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update user with error: " + err.Error(),
 		})

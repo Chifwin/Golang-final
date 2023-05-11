@@ -20,19 +20,13 @@ type Purchase struct {
 func scanPurchase(rows pgx.Row) (Purchase, error) {
 	var purchase Purchase
 	err := rows.Scan(&purchase.ID, &purchase.UserID, &purchase.ProductId, &purchase.SellerId, &purchase.Date, &purchase.Quantity)
-	return purchase, err
+	return purchase, handleError(err)
 }
 
 func filterPurchases(condition string) ([]Purchase, error) {
 	db := getConn()
 	rows, err := db.Query(context.Background(), "SELECT * FROM purchases where "+condition)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			return make([]Purchase, 0), nil
-		}
-		return nil, err
-	}
-	return scanManyData(rows, scanPurchase)
+	return scanManyData(rows, err, scanPurchase)
 }
 
 func BuyerPurchases(buyer_id int) ([]Purchase, error) {
@@ -54,8 +48,5 @@ func Buy(purchase Purchase) (Purchase, error) {
 func LastPurchases() ([]Purchase, error) {
 	db := getConn()
 	rows, err := db.Query(context.Background(), "select * from purchases order by date desc ")
-	if err != nil {
-		return nil, err
-	}
-	return scanManyData(rows, scanPurchase)
+	return scanManyData(rows, err, scanPurchase)
 }
