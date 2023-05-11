@@ -76,19 +76,19 @@ func AddProduct(product Product) (Product, error) {
 
 func UpdateProduct(product_id int, product Product) (Product, error) {
 	db := getConn()
-	row := db.QueryRow(context.Background(), "update product set name = $1, description = $2 where product_id = $3 returning *", product.Name, product.Description, product_id)
+	row := db.QueryRow(context.Background(), "update products set name = $1, description = $2 where id = $3 returning *", product.Name, product.Description, product_id)
 	return scanProduct(row)
 }
 
 // Seller part
-func SellerProducts(seller_id int, show_published bool) ([]ProductFromSeller, error) {
+func SellerProducts(seller_id int, show_not_published bool) ([]ProductFromSeller, error) {
 	db := getConn()
 
 	rows, err := db.Query(context.Background(), `
         SELECT ps.product_id, ps.seller_id, ps.quantity, ps.cost, ps.published
         FROM product_seller ps
         JOIN users u ON ps.seller_id = u.id
-        WHERE u.id = $1 and ps.published = $1`, seller_id, show_published)
+        WHERE u.id = $1 and (ps.published or ps.published = $2)`, seller_id, !show_not_published)
 	if err != nil {
 		return nil, err
 	}

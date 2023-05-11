@@ -75,7 +75,7 @@ create table purchases
     buyer_id   int references users (id) on update cascade on delete cascade,
     product_id int references products (id) on update cascade on delete restrict,
     seller_id  int references users (id) on update cascade on delete set null,
-    date       date default now(),
+    date       timestamp default now(),
     quantity   int check ( quantity > 0 )
 );
 create or replace trigger product_seller_tg

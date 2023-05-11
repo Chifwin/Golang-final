@@ -33,7 +33,7 @@ begin
 end;
 $$;
 
--- Buyer function
+-- Buy function
 create or replace function buy(_buyer_id integer, _seller_id integer, _product_id integer, _quantity integer)
     returns table
             (
@@ -43,53 +43,16 @@ create or replace function buy(_buyer_id integer, _seller_id integer, _product_i
 as
 $$
 begin
-    if ((select count(*)
-         from product_seller
-         where product_id = _product_id
-           and seller_id = _seller_id
-           and published = true) != 1) then
-        raise 'seller do not have such product or it is not published';
-    end if;
-
-    update product_seller
-    set quantity = quantity - _quantity
+    update product_seller set quantity = quantity - _quantity
     where product_id = _product_id
       and seller_id = _seller_id
       and published = true;
+    if not FOUND then
+        raise exception 'Seller do not have such product or it is not published';
+        return;
+    end if;
 
     return query insert into purchases (buyer_id, product_id, seller_id, quantity)
         values (_buyer_id, _product_id, _seller_id, _quantity) returning *;
-end;
-$$;
-
-
-
--- Zarina's updates
--- BuyerScore function
-create or replace function score(_purchase_id integer, _rating integer, _comment varchar)
-    returns table
-            (
-                like scores
-            )
-    language plpgsql
-as
-$$
-begin
-    if ((select count(*)
-         from scores
-         where purchase_id = _purchase_id
-           and rating = _rating
-           and comment = _comment
-         ) != 1) then
-        raise 'seller do not have such product or it is not published';
-    end if;
-
-    update scores
-    set purchase_id = scores.purchase_id - _purchase_id
-    where rating = _rating
-      and comment = _comment;
-
-    return query insert into scores (purchase_id, rating, comment)
-        values (_purchase_id, _rating, _comment) returning *;
 end;
 $$;

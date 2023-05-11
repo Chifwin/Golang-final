@@ -95,6 +95,7 @@ func RegisterUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add user with error: " + err.Error(),
 		})
+		return
 	}
 	ctx.JSON(http.StatusAccepted, gin.H{
 		"message": "Succesfulli created",

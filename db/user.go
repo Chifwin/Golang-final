@@ -45,7 +45,7 @@ type UserRet struct {
 
 func scanUserRet(row pgx.Row) (UserRet, error) {
 	var user UserRet
-	err := row.Scan(&user.ID, user.Username, user.Name, user.Role)
+	err := row.Scan(&user.ID, &user.Username, &user.Name, &user.Role)
 	return user, err
 }
 
@@ -72,6 +72,6 @@ func GetAllUsers() ([]UserRet, error) {
 
 func DeleteUser(user_id int) (UserRet, error) {
 	db := getConn()
-	row := db.QueryRow(context.Background(), "delete from users where id = $1 returning *", user_id)
+	row := db.QueryRow(context.Background(), "delete from users where id = $1 returning id, username, name, role", user_id)
 	return scanUserRet(row)
 }
